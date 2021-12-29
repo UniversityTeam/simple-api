@@ -12,9 +12,16 @@ const workingDB = new Database({
     database: 'WebNodeJS'
 }, initSql);
 
+
 http.createServer(async (request, response) => {
     response.setHeader('Content-Type', 'application/json');
     const query = workingDB.sql();
+
+    let data = '';
+    await request.on('data', chunk => {
+        data += chunk;
+    })
+    data = JSON.parse(data);
 
     if (request.url === "/filmsList"){
         query.select('*').inTable('Films')
@@ -26,6 +33,17 @@ http.createServer(async (request, response) => {
             }
 
         })
+    } else if (request.url === "/addUser"){
+        query.insert({ email: data.email, password: data.password}).inTable('User');
+        await query.exec((e, res) => {
+            if (e) {
+                console.log(e.message);
+            } else {
+                console.log(`Result: ${JSON.stringify(res)}`);
+            }
+
+        })
+
     }
     response.end();
 }).listen(3000);
