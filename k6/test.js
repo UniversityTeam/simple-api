@@ -1,4 +1,4 @@
-import http from "k6/http";
+import http from 'k6/http';
 import { check, sleep } from 'k6';
 const baseURL = 'http://localhost:3000';
 
@@ -7,8 +7,9 @@ export const options = {
         getFilmsList: {
             executor: "ramping-vus",
             stages: [
-                { target: 200, duration: "10s" },
-                { target: 200, duration: "10s" },
+                { target: 10, duration: "20s" },
+                { target: 1000, duration: "5s" },
+                { target: 50, duration: "1s" },
                 { target: 0, duration: "10s" },
             ],
             exec: "getFilmsList",
@@ -23,7 +24,6 @@ export function getFilmsList() {
     const res = http.get(`${baseURL}/filmsList`);
     check(res, {
         'is status 200': (r) => r.status === 200,
-
     });
     sleep(1);
 }
